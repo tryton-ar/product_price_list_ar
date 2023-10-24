@@ -1,0 +1,43 @@
+#
+msgid ""
+msgstr "Content-Type: text/plain; charset=utf-8\n"
+
+msgctxt "field:account.invoice,price_list:"
+msgid "Price List"
+msgstr "Lista de precios"
+
+msgctxt "field:product.price_list,currency:"
+msgid "Currency"
+msgstr "Moneda"
+
+msgctxt "field:sale.sale,currency_rate:"
+msgid "Currency rate"
+msgstr "Tasa de cambio"
+
+msgctxt "help:account.invoice,price_list:"
+msgid "Price list to compute the unit price of lines."
+msgstr "Lista de precios"
+
+msgctxt "model:invoice.update_line_price.start,name:"
+msgid "Invoice Update Line Price Start"
+msgstr "Actualizar precios - Inicio"
+
+msgctxt "model:ir.action,name:wiz_invoice_update_line_price"
+msgid "Update Lines Price"
+msgstr "Actualizar precios"
+
+msgctxt "view:account.invoice:"
+msgid "Update Lines Price"
+msgstr "Actualizar precios"
+
+msgctxt "view:invoice.update_line_price.start:"
+msgid "Lines price will be updated with the price list."
+msgstr "Los precios se actualizarán en base a la lista de precios"
+
+msgctxt "wizard_button:invoice.update_line_price,start,end:"
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgctxt "wizard_button:invoice.update_line_price,start,update:"
+msgid "Update"
+msgstr "Actualizar"
