@@ -1,6 +1,7 @@
 # This file is part of product_price_list_ar module for Tryton.
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
+from decimal import Decimal
 
 from trytond.model import fields
 from trytond.pool import PoolMeta
@@ -17,9 +18,12 @@ class Sale(metaclass=PoolMeta):
 
     @fields.depends('currency', 'company')
     def on_change_currency(self):
-        if self.currency:
+        if self.currency and self.currency.rate and \
+                self.company.currency.rate:
             self.currency_rate = (
                 self.company.currency.rate / self.currency.rate)
+        else:
+            self.currency_rate = Decimal('1.0')
 
     def create_invoice(self):
         invoice = super().create_invoice()
