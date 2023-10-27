@@ -38,31 +38,64 @@ class PriceList(metaclass=PoolMeta):
             return True
         return False
 
+    def get_context_formula(self, party, product, unit_price, quantity, uom,
+            pattern=None):
+        pool = Pool()
+        PriceList = pool.get('product.price_list')
+        Currency = pool.get('currency.currency')
+
+        res = super().get_context_formula(party, product, unit_price,
+                quantity, uom, pattern=None)
+        context = Transaction().context
+        if context.get('price_list') and context.get('currency'):
+            price_list = PriceList(context.get('price_list'))
+            currency = Currency(context.get('currency'))
+            if price_list.currency != currency:
+                if price_list.currency.rate != 0:
+                    rate = Decimal(str(
+                        currency.rate / price_list.currency.rate))
+                    if isinstance(res['names']['unit_price'], Decimal):
+                        res['names']['unit_price'] /= rate
+                    if isinstance(res['names']['cost_price'], Decimal):
+                        res['names']['cost_price'] /= rate
+                    if isinstance(res['names']['list_price'], Decimal):
+                        res['names']['list_price'] /= rate
+        return res
+
     def compute(self, party, product, unit_price, quantity, uom,
             pattern=None):
         'Compute price based price list currency'
         pool = Pool()
         PriceList = pool.get('product.price_list')
         Currency = pool.get('currency.currency')
-        Company = pool.get('company.company')
 
         context = Transaction().context
         unit_price = super().compute(party, product, unit_price, quantity,
             uom, pattern=None)
         if context.get('price_list') and context.get('currency'):
             price_list = PriceList(context.get('price_list'))
+            if price_list.product_defined(product) is False:
+                return unit_price
             currency = Currency(context.get('currency'))
-            if price_list.currency != currency.id:
-                rate = 1
+            if price_list.currency != currency:
+                rate = None
                 if context.get('currency_rate'):
                     if int(context.get('currency_rate')) == 1:
-                        rate = currency.rate / price_list.currency.rate
-                else:
-                    company = Company(context.get('company'))
-                    if company.currency.id == currency.id:
-                        rate = currency.rate / price_list.currency.rate
+                        # currency_rate = 1 can not be used
+                        if price_list.currency.rate == 0:
+                            rate = Decimal('1.0')
+                        else:
+                            rate = Decimal(str(
+                                currency.rate / price_list.currency.rate))
                     else:
-                        rate = company.currency.rate / currency.rate
+                        rate = Decimal(context.get('currency_rate'))
+                else:
+                    # Calculate rate from currencies
+                    if price_list.currency.rate == 0:
+                        rate = Decimal('1.0')
+                    else:
+                        rate = Decimal(str(
+                            currency.rate / price_list.currency.rate))
                 unit_price *= rate
 
         return unit_price
