@@ -14,15 +14,22 @@ class Product(metaclass=PoolMeta):
         pool = Pool()
         PriceList = pool.get('product.price_list')
         Uom = pool.get('product.uom')
+        Party = pool.get('party.party')
 
         prices = super().get_sale_price(products, quantity=quantity)
 
         context = Transaction().context
         if context.get('price_list'):
             price_list = PriceList(context['price_list'])
-            uom = Uom(context['uom'])
+            uom = None
+            if context.get('uom'):
+                uom = Uom(context.get('uom'))
+            if context.get('customer'):
+                customer = Party(context['customer'])
+            else:
+                customer = None
             for product in products:
-                price = price_list.compute(context['customer'], product,
+                price = price_list.compute(customer, product,
                     prices[product.id], quantity, uom)
                 prices[product.id] = price
 
