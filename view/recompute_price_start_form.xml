@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<form>
+    <image name="tryton-dialog-information" xexpand="0" xfill="0"/>
+    <field name="method" widget="selection" colspan="4"/>
+    <group id="methods">
+        <label name="unit_price"/>
+        <field name="unit_price"/>
+        <group id="percentage" colspan="3">
+            <label name="percentage"/>
+            <field name="percentage" factor="100"/>
+            <label id="percentage_" string="%"/>
+        </group>
+    </group>
+    <field name="products" colspan="4"/>
+</form>
