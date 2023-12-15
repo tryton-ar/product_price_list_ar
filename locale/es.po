@@ -10,6 +10,26 @@ msgctxt "field:product.price_list,currency:"
 msgid "Currency"
 msgstr "Moneda"
 
+msgctxt "field:product.price_list.recompute_price.start,method:"
+msgid "Recompute Method"
+msgstr "Método de actualización"
+
+msgctxt "field:product.price_list.recompute_price.start,percentage:"
+msgid "Percentage"
+msgstr "Porcentaje"
+
+msgctxt "field:product.price_list.recompute_price.start,price_list:"
+msgid "Price List"
+msgstr "Tarifa"
+
+msgctxt "field:product.price_list.recompute_price.start,products:"
+msgid "Products"
+msgstr "Productos"
+
+msgctxt "field:product.price_list.recompute_price.start,unit_price:"
+msgid "Unit Price"
+msgstr "Precio unitario"
+
 msgctxt "field:sale.sale,currency_rate:"
 msgid "Currency rate"
 msgstr "Tasa de cambio"
@@ -22,9 +42,25 @@ msgctxt "model:invoice.update_line_price.start,name:"
 msgid "Invoice Update Line Price Start"
 msgstr "Actualizar precios - Inicio"
 
+msgctxt "model:ir.action,name:act_price_list_recompute_price"
+msgid "Recompute Prices"
+msgstr "Actualizar Tarifas"
+
 msgctxt "model:ir.action,name:wiz_invoice_update_line_price"
 msgid "Update Lines Price"
 msgstr "Actualizar precios"
+
+msgctxt "model:ir.ui.menu,name:menu_price_list_recompute_price"
+msgid "Recompute Prices"
+msgstr "Actualizar Tarifas"
+
+msgctxt "model:product.price_list.recompute_price.start,name:"
+msgid "Recompute Price List - Start"
+msgstr "Actualizar precios"
+
+msgctxt "selection:product.price_list.recompute_price.start,method:"
+msgid "Percentage"
+msgstr "Porcentaje"
 
 msgctxt "view:account.invoice:"
 msgid "Update Lines Price"
@@ -34,10 +70,22 @@ msgctxt "view:invoice.update_line_price.start:"
 msgid "Lines price will be updated with the price list."
 msgstr "Los precios se actualizarán en base a la lista de precios"
 
+msgctxt "view:product.price_list.recompute_price.start:"
+msgid "%"
+msgstr "%"
+
 msgctxt "wizard_button:invoice.update_line_price,start,end:"
 msgid "Cancel"
 msgstr "Cancelar"
 
 msgctxt "wizard_button:invoice.update_line_price,start,update:"
 msgid "Update"
+msgstr "Actualizar"
+
+msgctxt "wizard_button:product.price_list.recompute_price,start,end:"
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgctxt "wizard_button:product.price_list.recompute_price,start,recompute_:"
+msgid "Recompute"
 msgstr "Actualizar"
