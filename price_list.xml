@@ -16,5 +16,28 @@
             <field name="name">price_list_tree</field>
         </record>
 
+        <record model="ir.ui.view" id="price_list_recompute_start_view_form">
+            product.price_list.recompute_price.start
+            <field name="model">product.price_list.recompute_price.start</field>
+            <field name="type">form</field>
+            <field name="name">recompute_price_start_form</field>
+        </record>
+
+        <record model="ir.action.wizard" id="act_price_list_recompute_price">
+            <field name="name">Recompute Prices</field>
+            <field name="wiz_name">product.price_list.recompute_price</field>
+        </record>
+
+        <menuitem
+            parent="product.menu_main_product"
+            action="act_price_list_recompute_price"
+            sequence="40"
+            id="menu_price_list_recompute_price"/>
+        <record model="ir.action-res.group"
+            id="act_product_price_recompute_group_sale">
+            <field name="action" ref="act_price_list_recompute_price"/>
+            <field name="group" ref="sale.group_sale"/>
+        </record>
+
     </data>
 </tryton>

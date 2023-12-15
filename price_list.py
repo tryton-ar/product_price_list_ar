@@ -1,12 +1,15 @@
 # This file is part of product_price_list_ar module for Tryton.
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
-from decimal import Decimal
+from decimal import Decimal, ROUND_HALF_UP
 from sql import Table
 
-from trytond.model import fields
+from trytond.model import fields, ModelView
+from trytond.modules.product import price_digits
 from trytond.pool import Pool, PoolMeta
+from trytond.pyson import Eval
 from trytond.transaction import Transaction
+from trytond.wizard import Wizard, StateView, StateTransition, Button
 
 
 class PriceList(metaclass=PoolMeta):
@@ -130,6 +133,45 @@ class PriceListLine(metaclass=PoolMeta):
         else:
             return amount * currency_rate / from_currency_rate
 
+    @classmethod
+    def _recompute_price_by_fixed_amount(cls, line, new_unit_price):
+        values = {
+            'formula': new_unit_price,
+            }
+        return values
+
+    @classmethod
+    def recompute_price_by_fixed_amount(cls, lines, unit_price):
+        to_write = []
+        for line in lines:
+            new_values = line._recompute_price_by_fixed_amount(line,
+                unit_price)
+            if new_values:
+                to_write.extend(([line], new_values))
+        if to_write:
+            cls.write(*to_write)
+
+    @classmethod
+    def _recompute_price_by_percentage(cls, line, factor):
+        list_price = Decimal(line.formula)
+        new_list_price = (list_price * factor).quantize(
+            Decimal('1.'), rounding=ROUND_HALF_UP)
+        values = {
+            'formula': str(new_list_price),
+            }
+        return values
+
+    @classmethod
+    def recompute_price_by_percentage(cls, lines, percentage):
+        to_write = []
+        factor = Decimal(1) + Decimal(percentage)
+        for line in lines:
+            new_values = cls._recompute_price_by_percentage(line, factor)
+            if new_values:
+                to_write.extend(([line], new_values))
+        if to_write:
+            cls.write(*to_write)
+
 
 class Currency(metaclass=PoolMeta):
     __name__ = 'currency.currency'
@@ -144,3 +186,86 @@ class Currency(metaclass=PoolMeta):
             return PriceListLine.compute_currency(from_currency, amount,
                 to_currency, currency_rate, round)
         return super().compute(from_currency, amount, to_currency, round)
+
+
+class ProductPriceRecomputeStart(ModelView):
+    'Recompute Price List - Start'
+    __name__ = 'product.price_list.recompute_price.start'
+
+    method = fields.Selection([
+            # ('fixed_amount', 'Fixed Amount'),
+            ('percentage', 'Percentage'),
+            ], 'Recompute Method', required=True)
+    percentage = fields.Float('Percentage', digits=(16, 4),
+        states={
+            'invisible': Eval('method') != 'percentage',
+            'required': Eval('method') == 'percentage',
+            },
+        depends=['method'])
+    unit_price = fields.Numeric('Unit Price', digits=price_digits,
+        states={
+            'invisible': Eval('method') != 'fixed_amount',
+            'required': Eval('method') == 'fixed_amount',
+            }, depends=['method'])
+    price_list = fields.Many2One('product.price_list','Price List',
+        required=True)
+    products = fields.Many2Many('product.product', None, None, 'Products')
+
+    @staticmethod
+    def default_unit_price():
+        return Decimal('0')
+
+    @staticmethod
+    def default_percentage():
+        return float(0)
+
+    @staticmethod
+    def default_method():
+        return 'percentage'
+
+    @classmethod
+    def view_attributes(cls):
+        return super().view_attributes() + [
+            ('/form//label[@id="percentage_"]', 'states', {
+                    'invisible': Eval('method') != 'percentage',
+                    }),
+            ]
+
+
+class ProductPriceRecompute(Wizard):
+    'Recompute Product Price'
+    __name__ = 'product.price_list.recompute_price'
+
+    start = StateView('product.price_list.recompute_price.start',
+        'product_price_list_ar.price_list_recompute_start_view_form', [
+            Button('Cancel', 'end', 'tryton-cancel'),
+            Button('Recompute', 'recompute_', 'tryton-ok', default=True),
+            ])
+    recompute_ = StateTransition()
+
+    def get_additional_args(self):
+        method_name = 'get_additional_args_%s' % self.start.method
+        if not hasattr(self, method_name):
+            return {}
+        return getattr(self, method_name)()
+
+    def get_additional_args_percentage(self):
+        return {
+            'percentage': self.start.percentage,
+            }
+
+    def transition_recompute_(self):
+        pool = Pool()
+        Line = pool.get('product.price_list.line')
+
+        method_name = 'recompute_price_by_%s' % self.start.method
+        method = getattr(Line, method_name)
+        if method:
+            domain = [
+                ('price_list', '=', self.start.price_list)
+            ]
+            if self.start.products:
+                products = [s.id for s in list(self.start.products)]
+                domain.append(('product', 'in', products))
+            method(Line.search(domain), **self.get_additional_args())
+        return 'end'
