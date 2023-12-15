@@ -20,7 +20,9 @@ def register():
         invoice.InvoiceUpdateLinePriceStart,
         sale.Sale,
         sale.Line,
+        price_list.ProductPriceRecomputeStart,
         module='product_price_list_ar', type_='model')
     Pool.register(
         invoice.InvoiceUpdateLinePrice,
+        price_list.ProductPriceRecompute,
         module='product_price_list_ar', type_='wizard')
