@@ -153,10 +153,11 @@ class PriceListLine(metaclass=PoolMeta):
 
     @classmethod
     def _recompute_price_by_percentage(cls, line, factor):
-        new_list_price = (line.formula * factor).quantize(
+        list_price = Decimal(line.formula)
+        new_list_price = (list_price * factor).quantize(
             Decimal('1.'), rounding=ROUND_HALF_UP)
         values = {
-            'formula': new_list_price,
+            'unit_price': str(new_list_price),
             }
         return values
 
@@ -192,7 +193,7 @@ class ProductPriceRecomputeStart(ModelView):
     __name__ = 'product.price_list.recompute_price.start'
 
     method = fields.Selection([
-            ('fixed_amount', 'Fixed Amount'),
+            # ('fixed_amount', 'Fixed Amount'),
             ('percentage', 'Percentage'),
             ], 'Recompute Method', required=True)
     percentage = fields.Float('Percentage', digits=(16, 4),
