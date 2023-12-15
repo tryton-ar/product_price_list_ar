@@ -157,7 +157,7 @@ class PriceListLine(metaclass=PoolMeta):
         new_list_price = (list_price * factor).quantize(
             Decimal('1.'), rounding=ROUND_HALF_UP)
         values = {
-            'unit_price': str(new_list_price),
+            'formula': str(new_list_price),
             }
         return values
 
