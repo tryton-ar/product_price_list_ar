@@ -206,6 +206,8 @@ class ProductPriceRecomputeStart(ModelView):
             'invisible': Eval('method') != 'fixed_amount',
             'required': Eval('method') == 'fixed_amount',
             }, depends=['method'])
+    price_list = fields.Many2One('product.price_list','Price List',
+        required=True)
     products = fields.Many2Many('product.product', None, None, 'Products')
 
     @staticmethod
@@ -258,7 +260,9 @@ class ProductPriceRecompute(Wizard):
         method_name = 'recompute_price_by_%s' % self.start.method
         method = getattr(Line, method_name)
         if method:
-            domain = []
+            domain = [
+                ('price_list', '=', self.start.price_list)
+            ]
             if self.start.products:
                 products = [s.id for s in list(self.start.products)]
                 domain.append(('product', 'in', products))

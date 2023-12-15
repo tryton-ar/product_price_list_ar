@@ -2,6 +2,7 @@
 <form>
     <image name="tryton-dialog-information" xexpand="0" xfill="0"/>
     <field name="method" widget="selection" colspan="4"/>
+    <field name="price_list" widget="selection" colspan="4"/>
     <group id="methods">
         <label name="unit_price"/>
         <field name="unit_price"/>
