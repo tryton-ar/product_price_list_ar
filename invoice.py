@@ -39,7 +39,7 @@ class Invoice(metaclass=PoolMeta):
 
     @fields.depends('currency', 'company')
     def on_change_currency(self):
-        if self.currency and self.currency.rate != 0:
+        if self.currency and self.currency.rate:
             self.currency_rate = (
                 self.company.currency.rate / self.currency.rate)
         else:
