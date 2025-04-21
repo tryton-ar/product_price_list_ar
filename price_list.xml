@@ -17,7 +17,6 @@
         </record>
 
         <record model="ir.ui.view" id="price_list_recompute_start_view_form">
-            product.price_list.recompute_price.start
             <field name="model">product.price_list.recompute_price.start</field>
             <field name="type">form</field>
             <field name="name">recompute_price_start_form</field>
