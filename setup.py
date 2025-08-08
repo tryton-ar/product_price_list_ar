@@ -7,11 +7,14 @@ import io
 import os
 import re
 from configparser import ConfigParser
+
 from setuptools import find_packages, setup
 
 MODULE = 'product_price_list_ar'
 PREFIX = 'trytonar'
-MODULE2PREFIX = {}
+MODULE2PREFIX = {
+    'account_invoice_ar': 'trytonar',
+    }
 
 
 def read(fname):
@@ -25,12 +28,13 @@ def read(fname):
 
 def get_require_version(name):
     if name in LINKS:
-        return ''  # '%s @ %s' % (name, LINKS[name])
+        return '%s @ %s' % (name, LINKS[name])
     if minor_version % 2:
         require = '%s >= %s.%s.dev0, < %s.%s'
     else:
         require = '%s >= %s.%s, < %s.%s'
-    require %= (name, major_version, minor_version,
+    require %= (
+        name, major_version, minor_version,
         major_version, minor_version + 1)
     return require
 
@@ -50,7 +54,11 @@ url = 'https://github.com/tryton-ar/%s' % MODULE
 download_url = 'https://github.com/tryton-ar/%s/tree/%s.%s' % (
     MODULE, major_version, minor_version)
 
-LINKS = {}
+LINKS = {
+    'trytonar_account_invoice_ar': ('git+https://github.com/tryton-ar/'
+        'account_invoice_ar.git@%s.%s#egg=trytonar-account-invoice-ar-%s.%s' %
+        (major_version, minor_version, major_version, minor_version)),
+}
 
 requires = []
 for dep in info.get('depends', []):
@@ -61,9 +69,6 @@ for dep in info.get('depends', []):
 requires.append(get_require_version('trytond'))
 
 tests_require = [get_require_version('proteus')]
-dependency_links = list(LINKS.values())
-if minor_version % 2:
-    dependency_links.append('https://trydevpi.tryton.org/')
 
 setup(name='%s_%s' % (PREFIX, MODULE),
     version=version,
@@ -78,6 +83,7 @@ setup(name='%s_%s' % (PREFIX, MODULE),
         "Forum": 'https://www.tryton.org/forum',
         "Source Code": url,
         },
+    keywords='tryton, invoice, account, argentina, price list',
     package_dir={'trytond.modules.%s' % MODULE: '.'},
     packages=(
         ['trytond.modules.%s' % MODULE]
@@ -100,21 +106,21 @@ setup(name='%s_%s' % (PREFIX, MODULE),
         'Natural Language :: Spanish',
         'Operating System :: OS Independent',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
         'Programming Language :: Python :: Implementation :: CPython',
         'Topic :: Office/Business',
         'Topic :: Office/Business :: Financial :: Accounting',
         ],
     license='GPL-3',
-    python_requires='>=3.7',
+    python_requires='>=3.8',
     install_requires=requires,
     extras_require={
         'test': tests_require,
         },
-    dependency_links=dependency_links,
     zip_safe=False,
     entry_points="""
     [trytond.modules]
