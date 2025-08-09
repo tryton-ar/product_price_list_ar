@@ -41,14 +41,13 @@ class PriceList(metaclass=PoolMeta):
             return True
         return False
 
-    def get_context_formula(self, party, product, unit_price, quantity, uom,
-            pattern=None):
+    def get_context_formula(self, product, quantity, uom, pattern=None):
         pool = Pool()
         PriceList = pool.get('product.price_list')
         Currency = pool.get('currency.currency')
 
-        res = super().get_context_formula(party, product, unit_price,
-                quantity, uom, pattern=None)
+        res = super().get_context_formula(product, quantity, uom, pattern)
+
         context = Transaction().context
         if context.get('price_list') and context.get('currency'):
             price_list = PriceList(context.get('price_list'))
@@ -65,16 +64,15 @@ class PriceList(metaclass=PoolMeta):
                         res['names']['list_price'] /= rate
         return res
 
-    def compute(self, party, product, unit_price, quantity, uom,
-            pattern=None):
+    def compute(self, product, quantity, uom, pattern=None):
         'Compute price based price list currency'
         pool = Pool()
         PriceList = pool.get('product.price_list')
         Currency = pool.get('currency.currency')
 
+        unit_price = super().compute(product, quantity, uom, pattern)
+
         context = Transaction().context
-        unit_price = super().compute(party, product, unit_price, quantity,
-            uom, pattern=None)
         if context.get('price_list') and context.get('currency'):
             price_list = PriceList(context.get('price_list'))
             if price_list.product_defined(product) is False:
